@@ -12,6 +12,9 @@ Create a `~/.toggl` file containing your API token (found in your [Toggl profile
 ### Insert vacation days entries
 `./bin/xoggl vacation 2016-01-01 2016-01-15`
 
+### Insert project days entries
+`./bin/xoggl project [project_name] 2016-01-01 2016-01-15`
+
 ## Development
 Run tests
 `rake spec`

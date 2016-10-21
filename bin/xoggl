@@ -12,10 +12,17 @@ pre do |global_options, command, options,args|
   $xoggl = Xoggl::Client.new
 end
 
-desc 'insert vacation days entries'
+desc 'track days entries for vacation'
 command :vacation do |c|
   c.action do |global_options, options, args|
     $xoggl.log_vacation(args[0], args[1])
+  end
+end
+
+desc 'track days entries for a project'
+command :project do |c|
+  c.action do |global_options, options, args|
+    $xoggl.log(args[1], args[2], args[0])
   end
 end
 
