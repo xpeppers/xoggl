@@ -24,6 +24,20 @@ module Xoggl
       end
     end
 
+    def log(start_isodate, end_isodate, project_name)
+      date = DateTime.iso8601(start_isodate)
+      end_date = DateTime.iso8601(end_isodate)
+
+      raise ArgumentError.new('End date must be greater than or equal to start date') if end_date < date
+
+      while date <= end_date do
+        create_entry(date_time_from(date, 9), project_name)
+        create_entry(date_time_from(date, 14), project_name)
+
+        date = date.next_day
+      end
+    end
+
     private
 
     def log_on?(date)
@@ -32,6 +46,17 @@ module Xoggl
 
     def date_time_from(date, hours)
       DateTime.new(date.year, date.month, date.day, hours - @zone_offset)
+    end
+
+    def create_entry(start_time, project_name)
+      @toggl.create_time_entry({
+        'billable' => true,
+        'description' => project_name,
+        'tags' => [],
+        'pid' => project_id_from(project_name),
+        'duration' => 14400,
+        'start' => @toggl.iso8601(start_time)
+      })
     end
 
     def create_vacation_entry(start_time)
@@ -49,7 +74,11 @@ module Xoggl
     end
 
     def vacation_project_id
-      @vacation_project_id ||= @toggl.my_projects.select { |project| project['name'] = 'Assenza' }.first['id']
+      @vacation_project_id ||= @toggl.my_projects.select { |project| project['name'] == 'Assenza' }.first['id']
+    end
+
+    def project_id_from(project_name)
+      @toggl.my_projects.select { |project| project['name'] == project_name }.first['id']
     end
   end
 end
