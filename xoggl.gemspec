@@ -1,6 +1,6 @@
-# coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+
 require 'xoggl/version'
 
 Gem::Specification.new do |spec|
@@ -8,16 +8,16 @@ Gem::Specification.new do |spec|
   spec.version = Xoggl::VERSION
   spec.authors = ['Filippo Liverani']
   spec.email = ['filippo.liverani@xpeppers.com']
-  spec.summary = %q{Simple Toggl cli}
+  spec.summary = 'Simple Toggl cli'
   spec.homepage = 'https://github.com/xpeppers/xoggl'
   spec.license = 'MIT'
 
-  spec.files = `git ls-files -z`.split("\x0")
+  spec.files = `git ls-files`.split("\n") - ['.gitignore', '.travis.yml']
   spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
-  spec.requirements  << 'A Toggl account (https://toggl.com/)'
+  spec.requirements << 'A Toggl account (https://toggl.com/)'
 
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'

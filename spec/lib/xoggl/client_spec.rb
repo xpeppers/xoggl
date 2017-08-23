@@ -4,8 +4,8 @@ describe Xoggl::Client do
     @client = Xoggl::Client.new(@toggl)
     @workspace_id = @toggl.workspaces.first['id']
 
-    @toggl.create_project({ 'name' => 'Assenza', 'wid' => @workspace_id })
-    @toggl.create_project({ 'name' => 'A project', 'wid' => @workspace_id })
+    @toggl.create_project('name' => 'Assenza', 'wid' => @workspace_id)
+    @toggl.create_project('name' => 'A project', 'wid' => @workspace_id)
   end
 
   after :all do
@@ -20,20 +20,20 @@ describe Xoggl::Client do
     end
   end
 
-  context 'for a vacation entry' do
+  context 'vacation' do
     it 'creates the entry' do
       start_date = '2016-01-04'
-      end_date =  '2016-01-04'
+      end_date = '2016-01-04'
 
       @client.log_vacation(start_date, end_date)
 
       expect(entries.count).to eq(2)
-      expect(entries.first).to include("description" => "Ferie")
+      expect(entries.first).to include('description' => 'Ferie')
     end
 
     it 'does not create the entry on weekends' do
       start_date = '2016-01-09'
-      end_date =  '2016-01-09'
+      end_date = '2016-01-09'
 
       @client.log_vacation(start_date, end_date)
 
@@ -42,7 +42,7 @@ describe Xoggl::Client do
 
     it 'does not create the entry on holidays' do
       start_date = '2016-01-06'
-      end_date =  '2016-01-06'
+      end_date = '2016-01-06'
 
       @client.log_vacation(start_date, end_date)
 
@@ -50,24 +50,24 @@ describe Xoggl::Client do
     end
   end
 
-  context 'for a generic project' do
+  context 'work' do
     it 'does not create an entry with a start date greater than end date' do
       start_date = '2016-10-05'
-      end_date =  '2016-10-04'
+      end_date = '2016-10-04'
 
-      expect {
-        @client.log(start_date, end_date, 'A project')
-      }.to raise_error(ArgumentError)
+      expect do
+        @client.log_work(start_date, end_date, 'A project')
+      end.to raise_error(ArgumentError)
     end
 
     it 'creates an entry' do
       start_date = '2016-01-04'
-      end_date =  '2016-01-04'
+      end_date = '2016-01-04'
 
-      @client.log(start_date, end_date, 'A project')
+      @client.log_work(start_date, end_date, 'A project')
 
       expect(entries.count).to eq(2)
-      expect(entries.first).to include("description" => "A project")
+      expect(entries.first).to include('description' => 'A project')
     end
   end
 
@@ -77,10 +77,9 @@ describe Xoggl::Client do
 
   def delete_all_projects(toggl, workspace_id)
     projects = toggl.projects(workspace_id)
-    unless projects.nil?
-      project_ids ||= projects.map { |p| p['id'] }
-      return unless project_ids.length > 0
-      toggl.delete_projects(project_ids)
-    end
+    project_ids = projects.map { |p| p['id'] }
+    return if project_ids.empty?
+
+    toggl.delete_projects(project_ids)
   end
 end
