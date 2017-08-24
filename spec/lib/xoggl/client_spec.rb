@@ -1,7 +1,9 @@
+TEST_API_TOKEN = '9b07c50c5126baf8c2d263b3dbfde3ee'
+
 describe Xoggl::Client do
   before :all do
-    @toggl = TogglV8::API.new('9b07c50c5126baf8c2d263b3dbfde3ee')
-    @client = Xoggl::Client.new(@toggl)
+    @client = Xoggl::Client.new(TEST_API_TOKEN)
+    @toggl = TogglV8::API.new(TEST_API_TOKEN)
     @workspace_id = @toggl.workspaces.first['id']
 
     @toggl.create_project('name' => 'Assenza', 'wid' => @workspace_id)
@@ -9,15 +11,11 @@ describe Xoggl::Client do
   end
 
   after :all do
-    delete_all_projects(@toggl, @workspace_id)
-    projects = @toggl.my_projects
-    expect(projects).to be_empty
+    delete_projects
   end
 
   after :each do
-    entries.each do |entry|
-      @toggl.delete_time_entry(entry['id'])
-    end
+    delete_entries
   end
 
   context 'vacation' do
@@ -71,15 +69,23 @@ describe Xoggl::Client do
     end
   end
 
+  private
+
+  def delete_entries
+    entries.each do |entry|
+      @toggl.delete_time_entry(entry['id'])
+    end
+  end
+
   def entries
     @toggl.get_time_entries(start_date: '2016-01-01', end_date: '2016-01-09')
   end
 
-  def delete_all_projects(toggl, workspace_id)
-    projects = toggl.projects(workspace_id)
+  def delete_projects
+    projects = @toggl.projects(@workspace_id)
     project_ids = projects.map { |p| p['id'] }
     return if project_ids.empty?
 
-    toggl.delete_projects(project_ids)
+    @toggl.delete_projects(project_ids)
   end
 end

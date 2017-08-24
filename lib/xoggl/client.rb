@@ -3,8 +3,8 @@ require 'holidays'
 
 module Xoggl
   class Client
-    def initialize(toggl = TogglV8::API.new)
-      @toggl = toggl
+    def initialize(api_token)
+      @toggl = TogglV8::API.new(api_token)
       @zone_offset = Time.now.utc_offset / 3600
     end
 

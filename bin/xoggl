@@ -7,19 +7,31 @@ require 'xoggl'
 include GLI::App
 
 program_desc 'A simple Toggl cli'
+version Xoggl::VERSION
 
 pre do
-  @xoggl = Xoggl::Client.new
+  token_file = File.join(Dir.home, '.toggl')
+  api_token = IO.read(token_file).strip if File.file?(token_file)
+  exit_now!('Please create a `~/.toggl` file containing your API token (found in your Toggl profile https://toggl.com/app/profile)') if api_token.nil? || api_token.empty?
+
+  @xoggl = Xoggl::Client.new(api_token)
 end
 
-desc 'track days entries for a project'
+desc 'Track days entries for a project'
+long_desc 'Example: xoggl work \'My Project\' 2017-02-03 2017-02-15'
+arg '<project_name>'
+arg '<start_date>'
+arg '<end_date>'
 command :work do |c|
   c.action do |_, _, args|
     @xoggl.log_work(args[1], args[2], args[0])
   end
 end
 
-desc 'track days entries for vacation'
+desc 'Track days entries for vacation'
+long_desc 'Example: xoggl vacation 2017-02-03 2017-02-15'
+arg '<start_date>'
+arg '<end_date>'
 command :vacation do |c|
   c.action do |_, _, args|
     @xoggl.log_vacation(args[0], args[1])
