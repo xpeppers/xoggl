@@ -38,4 +38,14 @@ command :vacation do |c|
   end
 end
 
+desc 'Track days entries for sick leave'
+long_desc 'Example: xoggl sick 2017-02-03 2017-02-15'
+arg '<start_date>'
+arg '<end_date>'
+command :sick do |c|
+  c.action do |_, _, args|
+    @xoggl.log_sick_leave(args[0], args[1])
+  end
+end
+
 exit run(ARGV)

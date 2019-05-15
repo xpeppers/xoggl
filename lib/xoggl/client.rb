@@ -15,12 +15,20 @@ module Xoggl
     end
 
     def log_vacation(start_isodate, end_isodate)
-      do_between(start_isodate, end_isodate) do |date|
-        log_vacation_day(date) unless to_skip?(date)
-      end
+      log_leave(start_isodate, end_isodate, 'Ferie')
+    end
+
+    def log_sick_leave(start_isodate, end_isodate)
+      log_leave(start_isodate, end_isodate, 'Malattia')
     end
 
     private
+
+    def log_leave(start_isodate, end_isodate, type)
+      do_between(start_isodate, end_isodate) do |date|
+        log_leave_day(date, type) unless to_skip?(date)
+      end
+    end
 
     def do_between(start_isodate, end_isodate)
       date = DateTime.iso8601(start_isodate)
@@ -44,9 +52,9 @@ module Xoggl
       create_work_entry(date_time_from(date, 14), project_name)
     end
 
-    def log_vacation_day(date)
-      create_vacation_entry(date_time_from(date, 9))
-      create_vacation_entry(date_time_from(date, 14))
+    def log_leave_day(date, type)
+      create_leave_entry(date_time_from(date, 9), type)
+      create_leave_entry(date_time_from(date, 14), type)
     end
 
     def create_work_entry(start_time, project_name)
@@ -60,12 +68,12 @@ module Xoggl
       )
     end
 
-    def create_vacation_entry(start_time)
+    def create_leave_entry(start_time, type)
       @toggl.create_time_entry(
         'billable' => false,
-        'description' => 'Ferie',
-        'tags' => ['Ferie'],
-        'pid' => vacation_project_id,
+        'description' => type,
+        'tags' => [type],
+        'pid' => leave_project_id,
         'duration' => 14_400,
         'start' => @toggl.iso8601(start_time)
       )
@@ -79,7 +87,7 @@ module Xoggl
       @workspace_id ||= @toggl.my_workspaces.first['id']
     end
 
-    def vacation_project_id
+    def leave_project_id
       @vacation_project_id ||= @toggl.my_projects.select do |project|
         project['name'] == 'Assenza'
       end.first['id']

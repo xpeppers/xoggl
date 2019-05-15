@@ -19,7 +19,6 @@ Gem::Specification.new do |spec|
 
   spec.requirements << 'A Toggl account (https://toggl.com/)'
 
-  spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'rspec-mocks'

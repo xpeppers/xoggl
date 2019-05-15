@@ -69,6 +69,18 @@ describe Xoggl::Client do
     end
   end
 
+  context 'sick leave' do
+    it 'creates an entry' do
+      start_date = '2016-01-04'
+      end_date = '2016-01-04'
+
+      @client.log_sick_leave(start_date, end_date)
+
+      expect(entries.count).to eq(2)
+      expect(entries.first).to include('description' => 'Malattia')
+    end
+  end
+
   private
 
   def delete_entries
